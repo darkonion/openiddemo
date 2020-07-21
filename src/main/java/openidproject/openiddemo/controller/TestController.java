@@ -1,20 +1,37 @@
 package openidproject.openiddemo.controller;
 
+import openidproject.openiddemo.services.UserDataService;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+import java.util.Map;
+
+@Controller
 public class TestController {
 
+    private final UserDataService userDataService;
 
-    @GetMapping("/test1")
-    public String test1() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+    public TestController(UserDataService userDataService) {
+        this.userDataService = userDataService;
     }
 
-    @GetMapping("/test2")
-    public String test2() {
-        return "test2";
+
+    @GetMapping("/")
+    public String test1() {
+        return "index";
+    }
+
+    @GetMapping("/identity")
+    public String test2(Model model) {
+        Map<String, Object> userData = userDataService.getUserData();
+        model.addAttribute("username", userData.getOrDefault("login", "none"));
+        model.addAttribute("avatar", userData.getOrDefault("avatar_url", "https://via.placeholder.com/300/09f/fff.png"));
+        model.addAttribute("account_url", userData.getOrDefault("url", "none"));
+        model.addAttribute("name", userData.getOrDefault("name", "none"));
+        model.addAttribute("company", userData.getOrDefault("company", "none"));
+        model.addAttribute("location", userData.getOrDefault("location", "none"));
+        return "identity";
     }
 }
